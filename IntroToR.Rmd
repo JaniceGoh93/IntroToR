@@ -122,6 +122,14 @@ data %>% filter(as.Date(Date) > as.Date("2020-09-01")) %>% head()
 ```
 
 
+## now let's try a new problem. how many patients are on metformin in our dataset? 
+
+```{r}
+data %>% filter(medications == "Metformin_500mg" | medications == "Metformin_850mg") %>%
+  pull(NRIC) %>% unique %>% length
+```
+
+
 ## Summarizing data 
 
 ```{r}

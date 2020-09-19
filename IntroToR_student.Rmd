@@ -117,6 +117,11 @@ Aug.data %>% left_join(par_level, by = c()) %>%
 
 ```
 
+## now let's try a new problem. how many patients are on metformin in our dataset? 
+
+```{r}
+
+```
 
 # Just a fun plotting exercise. Do we give out more metformin than amlodipine on average per day?
 
@@ -150,3 +155,4 @@ data %>% filter(medications  %in% c("Amlodipine_5mg", "Metformin_500mg")) %>%
 How many patients take more than one medication? 
 Is there an increase in usage of X medication due to X event that occured in Sept? 
 How much of a particular medication is being given out weekly? 
+
