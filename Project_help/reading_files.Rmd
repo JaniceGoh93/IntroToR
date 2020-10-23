@@ -1,0 +1,41 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+## Settings 
+
+```{r}
+library(tidyverse)
+library(data.table)
+getwd()
+```
+
+
+## load cdph data 
+
+```{r}
+cdph <- read_csv("~/Documents/NUS_R_workshops/Datasets/cdph_vre_bsi_odp_2019.csv")
+cdph
+```
+
+## load hsa data 
+
+```{r}
+file <- "~/Documents/NUS_R_workshops/Datasets/listing-of-illegal-health-products-found-in-singapore.csv"
+hsa <- read.csv(file, fileEncoding = "UTF-16", sep = ",", header = FALSE) 
+colnames(hsa) <- hsa[1,]
+hsa <- hsa[-1,]
+hsa
+```
+
+## load products data 
+
+```{r}
+products <- read_tsv("~/Documents/NUS_R_workshops/Datasets/Products.txt")
+products
+```
+
+

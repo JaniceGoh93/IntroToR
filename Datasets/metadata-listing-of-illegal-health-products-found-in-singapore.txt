@@ -1,0 +1,76 @@
+# Metadata for Listing of Illegal Health Products found in Singapore
+---
+Identifier: '6584cd65-678a-45b8-b655-c2aed119cfaa'
+Name: 'listing-of-illegal-health-products-found-in-singapore'
+Title: 'Listing of Illegal Health Products found in Singapore'
+Description: 'Listing of Illegal Health Products found in Singapore'
+Topics:
+  - 'Health'
+Keywords:
+  - 'Drug'
+  - 'Harmful'
+  - 'Health Products'
+  - 'Illegal'
+  - 'Poisonous'
+Publisher:
+  Name: 'Health Sciences Authority'
+  Admin 1:
+    Name: 'Simon Lin'
+    Department: 'IM Dept'
+    Email: 'Simon_LIN@hsa.gov.sg'
+Sources:
+  - 'Health Sciences Authority'
+Source Url: 'http://www.hsa.gov.sg/content/hsa/en/Health_Products_Regulation/Consumer_Information/Illegal_Health_Products/Illegal_Products_Found_in_Singapore.html'
+License: 'https://data.gov.sg/open-data-licence'
+Frequency: 'Annual'
+Coverage: '2016-07-01 to 2018-06-29'
+Last Updated: '2018-12-12T07:54:47.246984'
+Resources:
+  -
+    Identifier: 'a38f6758-e204-4896-8e98-368ef4cadfc1'
+    Title: 'Listing of Illegal Health Products found in Singapore'
+    Url: 'https://storage.data.gov.sg/listing-of-illegal-health-products-found-in-singapore/resources/listing-of-illegal-health-products-found-in-singapore-2018-06-29T03-08-22Z.csv'
+    Format: 'CSV'
+    Coverage: '2016-07-01 to 2018-06-29'
+    Last Updated: '2018-06-29T03:08:22.021852'
+    Schema:
+      -
+        Name: 'product_name'
+        Title: 'Product Name'
+        Type: 'text'
+        Sub Type: 'general'
+      -
+        Name: 'dosage_form'
+        Title: 'Dosage Form'
+        Type: 'text'
+        Sub Type: 'general'
+      -
+        Name: 'dosage_form_colour'
+        Title: 'Dosage Form Colour'
+        Type: 'text'
+        Sub Type: 'general'
+      -
+        Name: 'dosage_form_shape'
+        Title: 'Dosage Form Shape'
+        Type: 'text'
+        Sub Type: 'general'
+      -
+        Name: 'dosage_form_marking'
+        Title: 'Dosage Form Marking'
+        Type: 'text'
+        Sub Type: 'general'
+      -
+        Name: 'adulterant_type'
+        Title: 'Adulterant Type'
+        Type: 'text'
+        Sub Type: 'general'
+      -
+        Name: 'manufacturer_name'
+        Title: 'Manufacturer Name'
+        Type: 'text'
+        Sub Type: 'general'
+      -
+        Name: 'manufacturer_country'
+        Title: 'Manufacturer Country'
+        Type: 'text'
+        Sub Type: 'general'

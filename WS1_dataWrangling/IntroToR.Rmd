@@ -1,0 +1,201 @@
+---
+title: 'Intro to R tutorial'
+author: "Janice Goh"
+date: 'Run at `r format(Sys.time(), "%Y-%m-%d %H:%M")`'
+output:
+  html_document:
+    code_folding: show
+    theme: spacelab
+    number_sections: true
+    highlight: monochrome
+    fig_width: 11
+    fig_height: 8.5
+    toc: true
+    toc_float: true
+---
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Welcome to the concept of R environment. Think about this like the facebook game farmville. Initially there's nothing in that virtual environment. You can however, put things into that environment and tell the things what to do e.g. plant a carrot, then harvest it. We do so by using the R language to tell the computer what to do. In this case, we will be adding in our data to this environment. But first, some set up.
+
+# Settings 
+
+```{r}
+## uncomment and run installation if packages have not been installed
+#install.packages(c("tidyverse", "readxl"))
+setwd("~/Documents/IntroToR/")
+library(tidyverse)
+library(randomNames)
+library(readxl)
+```
+
+R by itself has some base functions, which in many online forums, will be refered to as base R. However, base R can be clunky at times and hard to read. Thankfully, the R community has come up with extra functions that make coding in R much easier. These functions are stored in libraries, like the ones we just downloaded. One of the most widely used packages is the tidyverse, which helps greatly in data wrangling. We are going to use that package today too. 
+
+
+# Generating data frame for today
+
+```{r, eval = F}
+set.seed(42)
+medications <- data.frame("medications" = 
+                            c("Amlodipine_5mg", "Metformin_500mg", "Atenolol_50mg", 
+                              "Metformin_850mg", "Paracetamol_500mg", "Doxycycline_100mg"),
+                          "item_code" = replicate(6, paste0("ITMN_", paste(sample( 0:9, 4, replace=T), collapse="" ), 
+                                               paste(sample(LETTERS, 2, replace=TRUE), collapse="" )))) %>%
+              unite("medID", medications, item_code, sep = "-")
+
+data <- data.frame("Name" = randomNames(500, ethnicity = 2), 
+                   "NRIC" = replicate(500, 
+                                      paste0("S", 
+                                             paste(sample( 0:9, 8, replace=TRUE), collapse="" ),  
+                                             sample(LETTERS, 1, replace = T))), 
+                   "medication"= replicate(500,
+                                           sample(medications$medID, 1, replace = T)), 
+                   "quantity" = replicate(500,
+                                          sample(c(30, 40, 50, 100, 200), 1, replace = T)),
+                   "Date" = Sys.Date() + sort(sample(-30:30, 500, replace = T))) %>%
+                   separate(medication, into = c("medications", "item_code"), sep = "-")
+data$NRIC[sample(1:500, 200, replace = T)] <- data$NRIC[c(1:200)]
+write_csv(data, "20200912_dispensingRecords.csv")
+```
+
+## Load data 
+
+our records are now stored in an object called 'data'. You can name this object anything you want. Check out the Global Environment on side panel if you are using R studio. The data object should now appear there. 
+
+```{r, results = F}
+data <- read.csv("20200912_dispensingRecords.csv")
+
+# View data 
+View(data)
+head(data)
+```
+
+# Question: which medications do we need to top up for September?
+
+What components do we need to make this decision, assuming that this data is true and accurate? 
+To break it down, we need to first find out how much we used in August
+But before we do that, a quick introduction on what data classes are. We will need to understandwhat data classes are in order to manipulate the data and answer our question.
+
+## Checking data classes 
+
+use the function 'class' 
+
+```{r}
+?class
+data %>% class
+```
+
+A dataframe is a class of object in R that contains multiple rows and columns, and can contain multiple data classes within them e.g. numeric and character data classes. A matrix on the other hand, can only contain one type of data class. 
+
+Now, what data classes do our data contain?
+
+## Data classes
+
+```{r}
+data %>% pull(medications) %>% class
+data %>% pull(quantity) %>% class
+data %>% pull(Date) %>% class
+
+```
+
+The factors are the variable in R, which takes the categorical variable and stores data in levels. The primary use of this function can be seen in data analysis and specifically in statistical analysis. Also, it helps to reduce data redundancy and to save a lot of space in the memory.
+
+There are a few downsides to factors though, as they do not always contain the characteristics of a character or date or numeric data class 
+
+## Attempting to filter by date 
+
+```{r}
+data %>% filter(Date > "2020-09-01")
+```
+
+This produces an error instead
+
+To correct this mistake, we need it to be in the correct data class
+
+## Correct date data class 
+
+```{r}
+data %>% filter(as.Date(Date) > as.Date("2020-09-01")) %>% head()
+
+```
+
+
+## Summarizing data 
+
+```{r}
+Aug.data <- data %>% separate(Date, into = c("YY", "MM", "DD"), sep = "-") %>%
+              mutate_at(c("YY", "MM", "DD"), as.numeric) %>%
+              filter(MM == 08) %>%
+              group_by(medications, item_code) %>% 
+              summarize(total_given = sum(quantity))
+```
+
+Now let's add in a few more details, like our par levels and top up levels and our initial quantity at the start of Aug 
+
+## Par level data 
+
+```{r, eval = F}
+set.seed(42)
+par_level <- medications %>% 
+              separate(medID, into = c("medications", "item_code"), sep = "-") %>% 
+              mutate(min_par = replicate(length(medications), sample(c(1000, 1500), 1)),
+                     max_par = replicate(length(medications), sample(c(3000, 5000), 1)))
+saveRDS(par_level, file = "par_level.RDS")
+```
+
+## Combining tables and making top up decisions 
+
+```{r}
+par_level <- readRDS("par_level.RDS")
+Aug.data %>% left_join(par_level, by = c("medications", "item_code")) %>%
+  mutate(current = max_par - total_given,
+         top_up = if_else(max_par - total_given < min_par, "Yes", "No"))
+
+```
+
+## now let's try a new problem. how many patients are on metformin in our dataset? 
+
+```{r}
+data %>% filter(medications == "Metformin_500mg" | medications == "Metformin_850mg") %>%
+  pull(NRIC) %>% unique %>% length
+data %>% filter(grepl("Metformin", medications, ignore.case = T)) %>% 
+  pull(NRIC) %>% unique %>% length
+```
+
+
+# Just a fun plotting exercise. Do we give out more metformin than amlodipine on average per day?
+
+```{r}
+tmp <- data %>% filter(medications  %in% c("Amlodipine_5mg", "Metformin_500mg")) %>%
+          group_by(medications, Date) %>%
+          summarize(total_qty = sum(quantity)) 
+
+## How to run a t.test? 
+?t.test
+tt.results <- t.test(tmp %>%  filter(medications == "Amlodipine_5mg") %>% pull(total_qty), 
+                  tmp %>% filter(medications == "Metformin_500mg")%>% pull(total_qty))
+## How to get results from a t.test?
+tt.results$p.value
+
+data %>% filter(medications  %in% c("Amlodipine_5mg", "Metformin_500mg")) %>%
+  group_by(medications, Date) %>%
+  summarize(total_qty = sum(quantity)) %>%
+  ggplot(aes(x = medications, y = total_qty, col = medications))+
+  geom_boxplot(aes(fill = medications, alpha = 0.2))+
+  geom_jitter()+
+  theme_bw()+
+  geom_text(aes(x = 2, y = 400, 
+                label = paste0("pvalue = ", tt.results$p.value)))+
+  theme(legend.position = "none")
+
+
+  
+
+```
+
+# Other questions you can ask:
+How many patients take more than one medication? 
+Is there an increase in usage of X medication due to X event that occured in Sept? 
+How much of a particular medication is being given out weekly? 
