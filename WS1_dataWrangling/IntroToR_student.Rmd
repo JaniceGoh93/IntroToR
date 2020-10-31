@@ -38,7 +38,7 @@ R by itself has some base functions, which in many online forums, will be refere
 our records are now stored in an object called 'data'. You can name this object anything you want. Check out the Global Environment on side panel if you are using R studio. The data object should now appear there. 
 
 ```{r, results = F}
-data <- read.csv("20200912_dispensingRecords.csv")
+data <- read.csv("")
 
 # View data 
 View(data)
@@ -104,7 +104,7 @@ Aug.data <- data %>% separate(Date, into = c("YY", "MM", "DD"), sep = "-") %>%
               mutate_at(c("YY", "MM", "DD"), as.numeric) %>%
               filter(MM == 08) %>%
               group_by(medications, item_code) %>% 
-              summarize(total_given = sum(quantity))
+              summarize(total_given = sum())
 ```
 
 Now let's add in a few more details, like our par levels and top up levels and our initial quantity at the start of Aug 

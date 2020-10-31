@@ -1,0 +1,128 @@
+---
+title: 'R tutorial workshop 2 ggplot'
+author: "Janice Goh"
+date: 'Ran on `r format(Sys.time(), "%Y-%m-%d %H:%M")`'
+output:
+  html_document:
+    code_folding: show
+    theme: spacelab
+    number_sections: true
+    highlight: monochrome
+    fig_width: 11
+    fig_height: 8.5
+    toc: true
+    toc_float: true
+---
+## Workshop objectives
+
+Today, we are going to continue practising data wrangling, as well as learning to do simple plots in ggplot.
+Similar to the tidyverse, ggplot was created to make figure making easier compared to baseR 
+For today, we are going to study how frequently do we have patients on multiple medications
+
+## Settings 
+
+```{r}
+## uncheck if not installed
+## install.packages("ggplot2")
+setwd("~/Documents/NUS_R_workshops/IntroToR/WS2_ggplot/")
+library(ggplot2)
+library(tidyverse)
+```
+
+
+# load dataset 
+
+```{r}
+data  <- read.csv()
+
+```
+
+## Question 1: How many patients do we have that are on multiple chromic medications? 
+
+Let's generate a list of patients on chronic meds for our team to review 
+
+## generate table of patients on more than 1 chronic medication
+
+```{r}
+chronic.meds <- data %>% filter(!medications == "Doxycycline_100mg" & 
+                                  !medications == "Paracetamol_500mg") %>%
+                  group_by(NRIC) %>%
+                  filter() %>% 
+                  arrange(names)
+View(chronic.meds)
+```
+
+# plot this as a histogram 
+
+```{r}
+chronic.meds %>% group_by(NRIC, names) %>%
+  summarize(n = n()) %>% 
+  ggplot(aes(x = n))+
+  geom_histogram()+
+  theme_bw()
+```
+
+## Question 2: which day was the busiest in the month of Oct, and which medication was the most popular?
+
+What graph can help us display such data? 
+
+# generating Oct dataset
+
+```{r}
+Oct.data <- data %>% 
+            separate(Date, into = c("MM", "DD", "YY"), sep = "/") %>% 
+              mutate(DD = as.numeric(DD)) %>%
+              filter(MM == "10")
+```
+
+# Counting number of line items and patients per day 
+
+```{r}
+Oct.summary <- Oct.data %>% group_by(DD) %>%
+                summarize("line_items" = ,
+                          "patients" = ) %>%
+                as.data.frame %>%
+                gather(key = "Type", value = "count", -DD)
+## checking that we did what we intended to do
+Oct.data %>% filter(DD == 10) %>% pull(NRIC) %>% unique %>% length
+```
+
+# Plotting our data as a line graph
+
+```{r}
+Oct.summary %>%
+  ggplot(aes(x =, y = , col = , group = ))+
+    geom_point(aes(alpha = 0.2))+
+  geom_()+
+  theme_bw()
+```
+
+# As a bar graph
+
+```{r}
+Oct.summary %>%
+  ggplot(aes(x = , y = ))+
+  geom_bar()+
+  #facet_wrap(~Type)+
+  theme_bw()
+```
+
+
+# a small subanalysis: is there a correlation between line items and patient count?
+
+```{r}
+Oct.summary<- Oct.summary %>%
+                reshape2::dcast(DD~Type)
+reg<-lm(patients ~ line_items, data = Oct.summary)
+Oct.summary %>%
+  ggplot(aes(x = line_items, y = patients))+
+  geom_point()+
+  stat_smooth(method = "lm")+
+  geom_text(x=30, y = 45, label = paste0("R^2=", summary(reg)$r.squared))+
+  geom_text(x = 30, y = 40, label = paste0("pval=", summary(reg)$coefficients[2,4]))+
+  theme_bw()
+```
+
+
+
+
